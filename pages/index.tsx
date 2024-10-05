@@ -1,7 +1,7 @@
 import Head from "next/head";
-import Image from "next/image";
 import localFont from "next/font/local";
 import styles from "@/styles/Home.module.css";
+import { useId, useState } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -14,7 +14,133 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export default function Home() {
+interface Answer {
+  id: string;
+  title: string;
+  score: number;
+}
+
+interface Question {
+  id: string;
+  question: string;
+  answers: Answer[];
+  selectedAnswer?: Answer;
+}
+
+
+
+const QuestionComponent: React.FC<{ question: Question }> = () => {
+
+  const [questionnaire, setQuestionnaire] = useState<Question[]>([
+
+    {
+      id: useId(),
+      question: `You're really busy at work and a colleague is telling you their life story and personal woes. You:`,
+      answers: [
+        {id:useId(), title: `Don't dare to interrupt them`, score: 4},
+  
+        {
+          id: useId(), 
+        title: `Think it's more important to give them some of your time; work can wait`,
+        score: 3
+        },
+        {
+          id: useId(),
+          title: `Listen, but with only with half an ear`,
+          score: 2
+        },
+        {
+          id: useId(),
+          title: `interrupt and explain that you are really busy at the moment`,
+          score: 1
+        }
+      ]
+    },
+  
+    {
+      id: useId(),
+      question: `You're having an animated discussion with a colleague regarding a project that you're in charge of. You:`,
+      answers: [
+        {id:useId(), title: `Don't dare contradict them`, score: 4},
+  
+        {
+          id: useId(), 
+        title: `Think that they are obviously right`,
+        score: 3
+        },
+        {
+          id: useId(),
+          title: `Defennd your own point of view tooth and nail`,
+          score: 2
+        },
+        {
+          id: useId(),
+          title: `continuously interrup your colleague`,
+          score: 1
+        }
+      ]
+    },
+  
+    {
+      id: useId(),
+      question: `You've been sitting in the doctors waiting room for more than 25minutes. You:`,
+      answers: [
+        {id:useId(), title: `Look at yopur watch every two minutes`, score: 4},
+  
+        {
+          id: useId(), 
+        title: `Bubble with inner anger, but keep quiet`,
+        score: 3
+        },
+        {
+          id: useId(),
+          title: `Explain to other equally impatient people in the room that the doctor is always running late`,
+          score: 2
+        },
+        {
+          id: useId(),
+          title: `complain in a loud voice while tapping your foot impatiently`,
+          score: 1
+        }
+      ]
+    }
+  ])
+  
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0)
+  
+  const selectAnswerHandler = (questionId: string, answer: Answer) => {
+    const newQuestionnaire = questionnaire.map((question) => {
+      if (question.id === questionId) {
+        question.selectedAnswer = answer
+      }
+  return question
+    })
+    setQuestionnaire(newQuestionnaire)
+  }
+  const nextQuestionHandler = () => {
+    setCurrentQuestionIndex(currentQuestionIndex + 1)
+  }
+  
+  const previousQuestionHandler = () => {
+    setCurrentQuestionIndex(currentQuestionIndex - 1)
+  }
+  
+
+  const submitHandler = () => {
+    const totalScores = questionnaire.reduce((total, question) => {
+      return total + (question.selectedAnswer?.score ?? 0);
+    }, 0);
+
+    if (totalScores <= 6) {
+      alert('You are a bloody Introvert');
+    } else {
+      alert('You are highly extroverted');
+    }
+
+    // Optionally reload the window
+    window.location.reload();
+  };
+
   return (
     <>
       <Head>
@@ -26,93 +152,56 @@ export default function Home() {
       <div
         className={`${styles.page} ${geistSans.variable} ${geistMono.variable}`}
       >
-        <main className={styles.main}>
-          <Image
-            className={styles.logo}
-            src="https://nextjs.org/icons/next.svg"
-            alt="Next.js logo"
-            width={180}
-            height={38}
-            priority
-          />
-          <ol>
-            <li>
-              Get started by editing <code>pages/index.tsx</code>.
-            </li>
-            <li>Save and see your changes instantly.</li>
-          </ol>
+       
+       <div className={styles.container}>
+      <h1>
+        Questions {currentQuestionIndex + 1}/{questionnaire.length}
+      </h1>
 
-          <div className={styles.ctas}>
-            <a
-              className={styles.primary}
-              href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Image
-                className={styles.logo}
-                src="https://nextjs.org/icons/vercel.svg"
-                alt="Vercel logomark"
-                width={20}
-                height={20}
-              />
-              Deploy now
-            </a>
-            <a
-              href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.secondary}
-            >
-              Read our docs
-            </a>
-          </div>
-        </main>
-        <footer className={styles.footer}>
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              aria-hidden
-              src="https://nextjs.org/icons/file.svg"
-              alt="File icon"
-              width={16}
-              height={16}
-            />
-            Learn
-          </a>
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              aria-hidden
-              src="https://nextjs.org/icons/window.svg"
-              alt="Window icon"
-              width={16}
-              height={16}
-            />
-            Examples
-          </a>
-          <a
-            href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              aria-hidden
-              src="https://nextjs.org/icons/globe.svg"
-              alt="Globe icon"
-              width={16}
-              height={16}
-            />
-            Go to nextjs.org →
-          </a>
-        </footer>
+      {questionnaire.map((question, index) => (
+        <div
+          className={index === currentQuestionIndex ? `${styles.show} ${styles.questionDiv}` : `${styles.hide} ${styles.questionDiv}`}
+          key={question.id}
+        >
+          <h1>{question.question}</h1>
+
+          <ul className={styles.unordered}>
+            {question.answers.map((answer, i) => (
+              <li
+                className={`${styles.list} ${question?.selectedAnswer?.id === answer.id ? styles.selected : ""}` }
+                key={i}
+                onClick={() => selectAnswerHandler(question.id, answer)}
+              >
+                {answer.title}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+
+      <div className={styles.buttonsDiv}>
+        {currentQuestionIndex !== 0 && (
+          <button className={styles.buttonn} onClick={previousQuestionHandler}>Previous</button>
+        )}
+        {currentQuestionIndex + 1 !== questionnaire.length ? (
+          <>
+            {questionnaire[currentQuestionIndex].selectedAnswer && (
+              <button className={styles.buttonn} onClick={nextQuestionHandler}>Next</button>
+            )}
+          </>
+        ) : (
+          <>
+            {questionnaire[currentQuestionIndex].selectedAnswer && (
+              <button className={styles.buttonn} onClick={submitHandler}>Submit</button>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+        
       </div>
     </>
   );
 }
+
+export default QuestionComponent;
